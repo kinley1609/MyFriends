@@ -1,0 +1,55 @@
+- friendadd.php:
+	+ count_mutual(): sử dụng list friend của user hiện tại, for each friend that appears on the add friend list -> take each of those people's fr list and compare with the current users ( find mutual elemt using array_intersect) -> use count() to count the array
+	+ Store friend in an array 
+
+1. **Initialization**:
+   ```php
+   $myfriends = array();
+   ```
+   This initializes an empty array named `$myfriends` to store the friend IDs of the logged-in user.
+
+2. **Select Friends of Logged-in User**:
+   ```php
+   $getmyfriends = $conn->query("SELECT friend_id2 AS friend_id FROM myfriends WHERE friend_id1 = " . $_SESSION["friend_id"] . " ORDER BY friend_id ASC;");
+   ```
+   This query selects the `friend_id2` values from the `myfriends` table where the `friend_id1` matches the `$_SESSION["friend_id"]`, indicating friends of the logged-in user. It orders the results by `friend_id` in ascending order.
+
+3. **Fetch and Store Friend IDs**:
+   ```php
+   while ($row = mysqli_fetch_assoc($getmyfriends)) {
+       $myfriends[] = $row["friend_id"];
+   }
+   ```
+   This loop fetches each row from the result set and appends the `friend_id` value to the `$myfriends` array.
+
+4. **Select Friends (Reverse Direction)**:
+   ```php
+   $getmyfriends = $conn->query("SELECT friend_id1 AS friend_id FROM myfriends WHERE friend_id2 = " . $_SESSION["friend_id"] . " ORDER BY friend_id ASC;");
+   ```
+   This query selects the `friend_id1` values from the `myfriends` table where the `friend_id2` matches the `$_SESSION["friend_id"]`, indicating friends of the logged-in user in the reverse direction. It orders the results by `friend_id` in ascending order.
+
+5. **Fetch and Store Friend IDs (Reverse Direction)**:
+   ```php
+   while ($row = mysqli_fetch_assoc($getmyfriends)) {
+       $myfriends[] = $row["friend_id"];
+   }
+   ```
+   This loop fetches each row from the result set and appends the `friend_id` value to the `$myfriends` array.
+
+6. **Sort Friends Array**:
+   ```php
+   sort($myfriends);
+   ```
+   This function sorts the `$myfriends` array in ascending order. Sorting the array facilitates operations such as calculating mutual friends.
+
+7. **Redirect if Not Logged In**:
+   ```php
+   } else {
+       header("location: login.php");
+   }
+   ```
+   If there are errors or the user is not logged in (`$err_msg` is not empty), the page is redirected to the login page.
+
+pagination comp:
+	- set page num = 0
+	- max page = maximum number of page based on counts of friend ( res_count )
